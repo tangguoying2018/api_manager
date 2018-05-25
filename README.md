@@ -48,7 +48,7 @@ yum install supervisor
 
 ```
 [include]
-files = /etc/supervisor/conf.d/*.conf /path/to/api_manager/config/*.conf
+files = /etc/supervisor/conf.d/*.conf /path/to/api_manager/config/*.ini
 ```
 
 5. 配置数据库
