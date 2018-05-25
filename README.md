@@ -51,7 +51,14 @@ yum install supervisor
 files = /etc/supervisor/conf.d/*.conf /path/to/api_manager/config/*.ini
 ```
 
-5. 配置数据库
+5. 创建数据库
+
+```
+create database `test_aaa` default character set utf8 collate utf8_unicode_ci;
+grant all on api_manager.* to api_manager_user@localhost identified by 'api_manager_PASS_123';
+```
+
+6. 配置数据库
 
 配置文件：settings.py
 
@@ -70,14 +77,14 @@ DATABASES = {
 }
 ```
 
-6. 初始化数据库
+7. 初始化数据库
 
 ```
 env/bin/python manage.py makemigrations app 
 env/bin/python manage.py migrate
 ```
 
-7. 创建用户
+8. 创建用户
 
 ```
 env/bin/python manage.py createsuperuser
