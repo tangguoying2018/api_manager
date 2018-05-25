@@ -87,8 +87,8 @@ python manage.py runserver --settings=api_manager.settings_dev
 
 ### 最后 - 相关截图
 
-![image](https://github.com/tangguoying2018/api_manager/screenshots/1.png)
-![image](https://github.com/tangguoying2018/api_manager/screenshots/2.png)
-![image](https://github.com/tangguoying2018/api_manager/screenshots/3.png)
-![image](https://github.com/tangguoying2018/api_manager/screenshots/4.png)
-![image](https://github.com/tangguoying2018/api_manager/screenshots/5.png)
+![image](https://raw.githubusercontent.com/tangguoying2018/api_manager/master/screenshots/1.png)
+![image](https://raw.githubusercontent.com/tangguoying2018/api_manager/master/screenshots/2.png)
+![image](https://raw.githubusercontent.com/tangguoying2018/api_manager/master/screenshots/3.png)
+![image](https://raw.githubusercontent.com/tangguoying2018/api_manager/master/screenshots/4.png)
+![image](https://raw.githubusercontent.com/tangguoying2018/api_manager/master/screenshots/5.png)
