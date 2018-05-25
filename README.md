@@ -1,7 +1,7 @@
 ### 项目介绍
 ----------
 
-该项目本来是由PHP写的，原项目地址:  
+该项目本来是 gongwalker 使用PHP写的，原项目地址:  
 https://github.com/gongwalker/ApiManager  
 
 现在做为个人python练手项目，所以就把它改成python版本了，改得有点粗糙，有需要的小伙伴可以拿去耍耍~   
