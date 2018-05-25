@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block mainwindow %}
+    <div id="mainwindow" class="col-md-12"
+         style="height:100%;background:white;margin:0px;overflow-y:auto;padding:0px;">
+        <!--顶部导航start-->
+        <div class="textshadow"
+             style="font-size:16px;widht:100%;height:60px;line-height:60px;padding:0 16px 0 16px;;border-bottom:#ddd 1px solid">
+            <span> <a class="home" href="{% url "app:index" %}">Home</a> - 登录</span>
+            <span id="topbutton" style="float:right">
+{#            <a href="?act=login">登录&nbsp;&nbsp;<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span></a>        </span>#}
+        </div>
+        <!--顶部导航end-->
+        <!--主窗口start-->
+        <div style="padding:16px;width:400px;left:50%;top:30%;position: absolute;transform:translate(-50%,-50%)">
+            <!--登录与退出start-->
+            <div style="border:1px solid #ddd;">
+                <div style="background:#f5f5f5;padding:20px;position:relative;">
+                    <h4>登录</h4>
+                    <div>
+                        <form action="{% url 'login' %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="username" placeholder="登录名"
+                                       required="required">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" name="password" placeholder="密码"
+                                       required="required">
+                            </div>
+                            <button class="btn btn-success">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!--登录与退出end-->
+        </div>
+        <!--主窗口end-->
+    </div>
+
+{% endblock %}

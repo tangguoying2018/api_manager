@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block left_navbar %}
+
+    {% if request.user.is_authenticated %}
+
+        <!--左侧导航start-->
+        <div id="navbar" class="col-md-3"
+             style="position:relative;background:#f5f5f5;padding:10px;height:100%;border-right:#ddd 1px solid;overflow-y:auto;">
+            {% block api_head %}
+                {{ block.super }}
+            {% endblock %}
+            <!--导航-->
+
+            <div class="form-group">
+                <input type="text" class="form-control" id="searchcate" onkeyup="search('cate',this)"
+                       placeholder="search here">
+            </div>
+
+            <div class="list">
+                <ul class="list-unstyled">
+
+                    {% for i in all_cate %}
+                        {% if i.isdel == 0 %}
+                            <form action="{% url 'app:del_class' %}" method="post">
+                                {% csrf_token %}
+                                <li class="menu" id="info_{{ i.aid }}">
+                                    <a href="{% url 'app:class_detail' %}?aid={{ i.aid }}">
+                                        {{ i.cname }}
+                                    </a>
+                                    <br>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;{{ i.cdesc }}
+                                    <input type='hidden' name='aid' value='{{ i.aid }}'> <br>
+                                    <!--只有超级管理员才可以对分类进行操作-->
+                                    <div style="float:right;margin-right:16px;">
+                                        &nbsp;<button class="btn btn-danger btn-xs" name="op" value="delete"
+                                                      onclick="javascript:return confirm('您确认要删除吗?')">delete
+                                    </button>
+                                        &nbsp;<button type="button"
+                                                      onclick="manage_class(this, '{{ i.aid }}', '{{ i.cname }}', '{{ i.cdesc }}')"
+                                                      class="btn btn-info btn-xs" name="edit_class" value="edit">edit
+                                    </button>
+                                    </div>
+                                    <br>
+                                    <hr>
+                                </li>
+                                <!--接口分类关键字(js通过此关健字进行模糊查找)start-->
+                                <span class="keyword" id="{{ i.aid }}">{{ i.cdesc }}<|-|>{{ i.cname }}</span>
+                                <!--接口关键字(js通过此关健字进行模糊查找)end-->
+                            </form>
+                        {% endif %}
+                    {% endfor %}
+
+
+                </ul>
+            </div>
+
+            <!--只有超级管理员才可以添加分类-->
+            <div style="float:right;margin-right:20px;">
+                <button onclick="manage_class(this, '', '', '')" class="btn btn-success" name="new_class" value="add">
+                    新建分类
+                </button>
+            </div>
+
+
+        </div>
+        <!--左侧导航end-->
+
+    {% endif %}
+{% endblock %}
+
+
+
+{% block mainwindow %}
+
+    {% if not request.user.is_authenticated %}
+        <div id="mainwindow" class="col-md-12"
+    {% else %}
+        <div id="mainwindow" class="col-md-9"
+    {% endif %}
+             style="height:100%;background:white;margin:0px;overflow-y:auto;padding:0px;">
+    <!--顶部导航start-->
+    <div class="textshadow"
+         style="font-size:16px;widht:100%;height:60px;line-height:60px;padding:0 16px 0 16px;;border-bottom:#ddd 1px solid">
+        <span> <a class="home" href="{% url "app:index" %}">Home</a> - 欢迎 </span>
+        <span id="topbutton" style="float:right">
+                    {% if request.user.is_authenticated %}
+                        {#                        欢迎您：{{ request.user.username }}&nbsp;&nbsp;<a href="{% url 'password_reset' %}">修改密码</a>&nbsp;#}
+                        欢迎您：{{ request.user.username }}&nbsp;
+                        &nbsp;<a href="{% url 'logout' %}">退出&nbsp;&nbsp;<span
+                            class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a>        </span>
+                    {% endif %}
+        {% if not request.user.is_authenticated %}
+            <a href="{% url 'login' %}">登录&nbsp;&nbsp;<span class="glyphicon glyphicon-log-in"
+                                                            aria-hidden="true"></span></a>
+        {% endif %}
+        </span>
+    </div>
+    <!--顶部导航end-->
+    <!--主窗口start-->
+    <div id="custom_div" style="padding:16px;">
+        <!--欢迎页-->
+        <!--info start-->
+        <div style="font-size:18px;">
+            <div class="info" style="font-size:14px;">
+                <span style="font-size:30px;" class="glyphicon glyphicon-grain" aria-hidden="true"></span> <span
+                    style="font-size:16px;">欢迎使用接口管理工具 v1.0 版</span><br>
+                <pre class="info" style="margin:10px 34px 10px 34px">
+什么是接口文档管理工具?
+&nbsp;&nbsp;&nbsp;&nbsp;是一个在线API文档系统；其致力于快速解决团队内部接口文档的编写、维护、存档，和减少团队协作开发的沟通成本。
+        </pre>
+            </div>
+        </div>
+        <!--欢迎页end-->
+    </div>
+    <!--主窗口end-->
+</div>
+
+{% endblock %}

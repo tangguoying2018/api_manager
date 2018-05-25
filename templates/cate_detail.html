@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load fun_filter %}
+
+{% block custom_style %}
+    <style>
+        #new_api {
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+
+{% block left_navbar %}
+
+    <!--左侧导航start-->
+    <div id="navbar" class="col-md-3"
+         style="position:relative;background:#f5f5f5;padding:10px;height:100%;border-right:#ddd 1px solid;overflow-y:auto;">
+
+        {% block api_head %}
+            {{ block.super }}
+        {% endblock %}
+        <!--导航-->
+
+
+        <div class="form-group">
+            <input type="text" class="form-control" id="searchapi" placeholder="search here"
+                   onkeyup="search('api',this)">
+        </div>
+
+        <div class="list">
+            <ul class="list-unstyled" style="padding:10px">
+
+
+                {% for  i in all_api %}
+                    {% with ret=i.id|gen_md5 %}
+                        <li class="menu" id="api_{{ ret }}">
+                            <a href="/class_detail/?aid={{ i.aid }}#info_api_{{ ret }}"
+                               id="menu_{{ ret }}">
+                                <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span>
+                                {{ i.name }} </a>
+                        </li>
+
+                        <!--接口关键字(js通过此关健字进行模糊查找)start-->
+                        <span class="keyword"
+                              id="{{ ret }}">{{ i.name }}<|-|>{{ i.num }}<|-|>{{ i.des }}<|-|><|-|>{{ i.parameter }}<|-|>{{ i.url }}<|-|>{{ i.type }}<|-|>{{ i.type|lower }}</span>
+                        <!--接口关键字(js通过此关健字进行模糊查找)end-->
+                    {% endwith %}
+                {% endfor %}
+
+
+            </ul>
+        </div>
+
+
+        <!--只有超级管理员才可以添加接口-->
+        <div style="float:right;margin-right:20px;">
+            <input type="hidden" value="2" name="aid">
+            <button class="btn btn-success"><a id="new_api" href="{% url "app:new_api" %}">新建接口</a></button>
+            <script>
+                document.getElementById("new_api").href += window.location.search
+            </script>
+        </div>
+
+
+        <!--end-->
+    </div>
+    <!--左侧导航end-->
+
+
+{% endblock %}
+
+
+
+{% block mainwindow %}
+
+
+    <div id="mainwindow" class="col-md-9" style="height:100%;background:white;margin:0px;overflow-y:auto;padding:0px;">
+
+        {% block custom_top %}
+            <!--顶部导航start-->
+            <div class="textshadow"
+                 style="font-size:16px;widht:100%;height:60px;line-height:60px;padding:0 16px 0 16px;;border-bottom:#ddd 1px solid">
+                <span id="home_id"> <a class="home" href="{% url "app:index" %}">Home</a> - {{ class_name }} </span>
+                <span id="topbutton" style="float:right">
+                    {% if request.user.is_authenticated %}
+                        {#                        欢迎您：{{ request.user.username }}&nbsp;&nbsp;<a href="{% url 'password_reset' %}">修改密码</a>&nbsp;#}
+                        欢迎您：{{ request.user.username }}&nbsp;
+                        &nbsp;<a href="{% url 'logout' %}">退出&nbsp;&nbsp;<span
+                            class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a>        </span>
+                    {% endif %}
+                {% if not request.user.is_authenticated %}
+                    <a href="{% url 'login' %}">登录&nbsp;&nbsp;<span class="glyphicon glyphicon-log-in"
+                                                                    aria-hidden="true"></span></a>
+                {% endif %}
+                </span>
+            </div>
+            <!--顶部导航end-->
+
+        {% endblock %}
+        <!--主窗口start-->
+
+        <div style="padding:16px;">
+            <!--接口详情列表与接口管理start-->
+
+
+            {% for i in all_api %}
+                {% with ret=i.id|gen_md5 %}
+                    <!--接口详细列表start-->
+                    <div class="info_api" style="border:1px solid #ddd;margin-bottom:20px;" id="info_api_{{ ret }}">
+                        <div style="background:#f5f5f5;padding:20px;position:relative">
+
+                            <div class="textshadow" style="position: absolute;right:0;top:4px;right:8px;">
+                                创建人: {{ i.firstuid|get_username }} &nbsp;最后修改者: {{ i.lastuid|get_username }} &nbsp;
+                                修改时间: {{ i.lasttime|get_time }}&nbsp;
+                                <button class="btn btn-danger btn-xs "
+                                        onclick="deleteApi({{ i.id }}, '{{ ret }}')">
+                                    delete
+                                </button>&nbsp;
+                                <button class="btn btn-info btn-xs "
+                                        onclick="editApi('{% url "app:edit_api" %}', {{ i.id }}, {{ i.aid }})">
+                                    edit
+                                </button>
+                                <button class="btn btn-primary btn-xs " onclick="copyApi({{ i.id }})">copy</button>
+                            </div>
+
+                            <h4 class="textshadow">{{ i.name }}</h4>
+                            <p>
+                                <b>编号&nbsp;&nbsp;:&nbsp;&nbsp;<span style="color:red">{{ i.num }}</span></b>
+                            </p>
+                            <div>
+                                <kbd style="color:red">{{ i.type }}</kbd> - <kbd>{{ i.url }}</kbd>
+                            </div>
+
+                        </div>
+
+                        <div class="info">
+                            {{ i.des }}
+                        </div>
+
+                        <div style="background:#ffffff;padding:20px;">
+                            <h5 class="textshadow">请求参数</h5>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th class="col-md-3">参数名</th>
+                                    <th class="col-md-2">参数类型</th>
+                                    <th class="col-md-2">必传</th>
+                                    <th class="col-md-2">缺省值</th>
+                                    <th class="col-md-5">描述</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                {% with tmp=i.parameter|convert %}
+                                    {% for k,v in tmp.items %}
+                                        <tr>
+                                            <td>{{ v.0 }}</td>
+                                            <td>{{ v.1 }}</td>
+                                            <td>
+                                                <span {% if v.2 == "Y" %}style="color:red"{% endif %}>{{ v.2 }}<span>
+                                            </td>
+                                            <td>{{ v.3 }}</td>
+                                            <td>{{ v.4 }}</td>
+                                        </tr>
+
+                                    {% endfor %}
+                                {% endwith %}
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="background:#ffffff;padding:20px;">
+                            <h5 class="textshadow">返回值</h5>
+                            <pre>{{ i.re|safe }}</pre>
+                        </div>
+
+                        <div style="background:#ffffff;padding:20px;">
+                            <h5 class="textshadow">备注</h5>
+                            <pre style="background:honeydew">{{ i.memo }}</pre>
+                        </div>
+
+                    </div>
+
+                    <!--接口详细列表end-->
+                    <!--接口详情返回顶部按钮start-->
+                    <div id="gotop" onclick="goTop()"
+                         style="z-index:999999;font-size:18px;display:none;color:#e6e6e6;cursor:pointer;width:42px;height:42px;border:#ddd 1px solid;line-height:42px;text-align:center;background:rgba(91,192,222, 0.8);position:fixed;right:20px;bottom:200px;border-radius:50%;box-shadow: 0px 0px 0px 1px #cccccc;">
+                        T
+                    </div>
+                    <!--接口详情返回顶部按钮end-->
+                {% endwith %}
+            {% endfor %}
+
+
+
+            <script>
+                //删除某个接口
+                var $url = '{% url "app:del_api" %}';
+                function deleteApi(api_id, div_id) {
+                    if (confirm('是否确认删除此接口?')) {
+                        $.ajaxSetup({
+                            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        });
+                        $.post($url, {api_id: api_id}, function (data) {
+                            if (data == 'success') {
+                                $('#api_' + div_id).remove();//删除左侧菜单
+                                $('#info_api_' + div_id).remove();//删除接口详情
+                            }
+                        })
+                    }
+                }
+                //编辑某个接口
+                function editApi(gourl, id, aid) {
+                    window.location.href = gourl+"?id="+id+"&aid="+aid;
+                }
+                //复制某个api
+                function copyApi(apiId) {
+                    var askName = layer.prompt({
+                        title: '输入新的api名称',
+                        formType: 0 //prompt风格，支持0-2
+                    }, function (pass) {
+                        $.ajaxSetup({
+                            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        });
+                        $.post({% url "app:copy_api" %}, {api_id: apiId, api_name: pass}, function (data) {
+                                if (data == "success") {
+                                    window.location.reload();
+                                }
+                            }
+                        )
+                    });
+                }
+
+                //返回顶部
+                function goTop() {
+                    $('#mainwindow').animate(
+                        {scrollTop: '0px'}, 200
+                    );
+                }
+
+                //检测滚动条,显示返回顶部按钮
+                document.getElementById('mainwindow').onscroll = function () {
+                    if (document.getElementById('mainwindow').scrollTop > 100) {
+                        document.getElementById('gotop').style.display = 'block';
+                    } else {
+                        document.getElementById('gotop').style.display = 'none';
+                    }
+                };
+            </script>
+            <!--接口详情列表与接口管理end-->
+
+
+        </div>
+
+        <!--主窗口end-->
+
+    </div>
+
+{% endblock %}

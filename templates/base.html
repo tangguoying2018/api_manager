@@ -1,0 +1,186 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh-CN" style="height:100%">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>API接口管理工具</title>
+    <link rel="icon" type="image/x-icon" href={% static "favicon.ico" %}>
+    <link href={% static "bootstrap-3.3.4-dist/css/bootstrap.min.css" %} rel="stylesheet">
+    <link href={% static "style.css" %} rel="stylesheet">
+    <style>
+        body { overflow-y: scroll; }
+    </style>
+    <!--[if lt IE 9]>
+    <script src={% static "html5shiv.min.js" %}></script>
+    <script src={% static "respond.min.js" %}></script>
+
+    <![endif]-->
+
+    {% block custom_style %}
+    {% endblock %}
+
+</head>
+
+
+<body style="height:100%">
+
+<div class="container-fluid" style="background:white;height:100%;">
+    <div class="row" style="height:100%;">
+
+
+        {% block left_navbar %}
+
+            {% if request.user.is_authenticated %}
+                {% block api_head %}
+                    <div style="height:50px;font-size:30px;line-height:50px;">
+                        <a class="home" style="color:#000000;text-shadow:1px 0px 1px #666;text-decoration: none"
+                           href="{% url "app:index" %}">
+                            <span class="glyphicon glyphicon-random" aria-hidden="true" style="width:40px;"></span>&nbsp;
+                            <span style="position: relative;top:-3px;">API Manager <span
+                                    style="font-size:12px;position:relative;top:-13px;">&nbsp;v1.0</span>
+                        </a>
+                        </span>
+                    </div>
+                {% endblock %}
+
+            {% endif %}
+
+        {% endblock %}
+        {% block mainwindow %}
+        {% endblock %}
+
+    </div>
+</div>
+
+<script src={% static "jquery.min.js" %}></script>
+<script src={% static "layer.js" %}></script>
+<script src={% static "jquery.cookie.js" %}></script>
+<script src={% static "bootstrap-3.3.4-dist/js/bootstrap.min.js" %}></script>
+
+
+<!--jquery模糊查询start-->
+<script>
+    var $COOKIE_KEY = "API_NAVBAR_STATUS"; //记录左侧菜单栏的开打与关闭状态的cookie的值
+    function search(type, obj) {
+        var $find = $.trim($(obj).val());//得到搜索内容
+        if (type == 'cate') {//对接口分类进行搜索操作
+            if ($find != '') {
+                $(".menu").hide();
+                //找到符合关键字的对象
+                var $keywordobj = $(".keyword:contains('" + $find + "')")
+                $keywordobj.each(function (i) {
+                    var menu_id = $($keywordobj[i]).attr('id');
+                    $("#info_" + menu_id).show();
+                });
+            } else {
+                $(".menu").show();//在没有搜索内容的情况下,左侧导航菜单 全部 显示
+            }
+        } else if (type == 'api') {//对接口进行搜索操作
+            if ($find != '') {
+                $(".menu").hide();//左侧导航菜单隐藏
+                $(".info_api").hide();
+                //找到符合关键字的对象
+                var $keywordobj = $(".keyword:contains('" + $find + "')")
+                $keywordobj.each(function (i) {
+                    var menu_id = $($keywordobj[i]).attr('id');
+                    $("#api_" + menu_id).show();//左侧导航菜单 部份 隐藏
+                    $("#info_api_" + menu_id).show();//接口详情 部份 隐藏
+                });
+            } else {
+                $(".menu").show();//在没有搜索内容的情况下,左侧导航菜单 全部 显示
+                $(".info_api").show();//在没有搜索内容的情况下,接口详情 全部 显示
+            }
+        }
+    }
+
+    {% if request.user.is_authenticated %}
+        window.onload = function () {
+            //添加关闭,打开左侧菜单的功能
+            var status_flg = "&lt";
+            var cursor = "w-resize"
+            var navbarButton = '<div onclick="navbar(this)" ' +
+                'style="text-align:center;line-height:120px;border-bottom-right-radius:5px;cursor:' + cursor + ';border-top-right-radius:5px;width:14px;height:120px;background: rgba(91,192,222, 0.8);position:fixed;left:0;top:260px;color:#fff;box-shadow: 0px 0px 0px 1px #cccccc;">' +
+                status_flg +
+                '</div>'
+            $('body').append(navbarButton);
+        }
+    {% endif %}
+    // 全屏和normal
+    function navbar(obj) {
+        if ($('#mainwindow').hasClass('col-md-9')) {
+            $(obj).html('&gt;');
+            $(obj).css("cursor", "e-resize");
+            $('#mainwindow').removeClass('col-md-9').addClass('col-md-12');
+            $('#navbar').hide();
+            $.cookie($COOKIE_KEY, '1');
+        } else {
+            $(obj).html('&lt;');
+            $(obj).css("cursor", "w-resize");
+            $('#mainwindow').removeClass('col-md-12').addClass('col-md-9');
+            $('#navbar').show();
+            $.cookie($COOKIE_KEY, '0');
+        }
+    }
+    function manage_class(arg, aid, cname, cdesc) {
+        name = $(arg).attr("name");
+        if (name == "new_class") {
+            desc = "添加分类"
+            cname = ""
+            cdesc = ""
+            aid = ""
+        }
+        if (name == "edit_class") {
+            desc = "编辑分类"
+            cname = cname
+            cdesc = cdesc
+            aid = aid
+        }
+        $('#custom_div').html(
+            '<div style="border:1px solid #ddd">' +
+            '        <div style="background:#f5f5f5;padding:20px;position:relative">' +
+            '            <h4>' + desc + '</h4>' +
+            '            <div>' +
+            '                <form action="' + "/" + name + "/" + '" method="post">' +
+            "                {% csrf_token %}" +
+            '                    <div class="form-group">' +
+            '                        <input type="text" class="form-control" name="cname" placeholder="分类名" value="' + cname + '">' +
+            '                    </div>' +
+            '                    <div class="form-group">' +
+            '                        <input class="form-control" name="aid" type="hidden" value="' + aid + '">' +
+            '                    </div>' +
+            '                    <div class="form-group">' +
+            '                        <input type="text" class="form-control" name="cdesc" placeholder="描述" value="' + cdesc + '">' +
+            '                    </div>' +
+            '                    <button class="btn btn-success" name="op" value="add">Submit</button>' +
+            '                </form>' +
+            '            </div>' +
+            '        </div>' +
+            '    </div>'
+        )
+    }
+    function add_api(obj) {
+        if ($('#mainwindow').hasClass('col-md-9')) {
+            $(obj).html('&gt;');
+            $(obj).css("cursor", "e-resize");
+            $('#mainwindow').removeClass('col-md-9').addClass('col-md-12');
+            $('#navbar').hide();
+            $.cookie($COOKIE_KEY, '1');
+        } else {
+            $(obj).html('&lt;');
+            $(obj).css("cursor", "w-resize");
+            $('#mainwindow').removeClass('col-md-12').addClass('col-md-9');
+            $('#navbar').show();
+            $.cookie($COOKIE_KEY, '0');
+        }
+    }
+</script>
+<!--jquery模糊查询end-->
+
+<!--end-->
+
+
+</body>
+</html>

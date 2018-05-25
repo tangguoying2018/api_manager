@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block mainwindow %}
+
+    <div id="mainwindow" class="col-md-12" style="height:100%;background:white;margin:0px;overflow-y:auto;padding:0px;">
+    <!--顶部导航start-->
+    <div class="textshadow"
+         style="font-size:16px;widht:100%;height:60px;line-height:60px;padding:0 16px 0 16px;;border-bottom:#ddd 1px solid">
+        <span> <a class="home" href="{% url "app:index" %}">Home</a> - 故障 </span>
+    </div>
+    <!--顶部导航end-->
+    <!--主窗口start-->
+    <div id="custom_div" style="padding:16px;">
+        <!--欢迎页-->
+        <!--info start-->
+        <div style="font-size:18px;">
+            <div class="info" style="font-size:14px;">
+                <span style="font-size:30px;" class="glyphicon glyphicon-grain" aria-hidden="true"></span> <span
+                    style="font-size:16px;">页面404</span><br>
+            </div>
+        </div>
+        <!--欢迎页end-->
+    </div>
+    <!--主窗口end-->
+</div>
+
+{% endblock %}
+

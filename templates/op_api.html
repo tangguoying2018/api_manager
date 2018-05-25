@@ -1,0 +1,242 @@
+{% extends 'cate_detail.html' %}
+{% load staticfiles %}
+{% load fun_filter %}
+
+
+{% block custom_style %}
+    <style>
+        #home_id {
+            margin-left: 16px;
+        }
+
+        #new_api {
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block left_navbar %}
+    {{ block.super }}
+{% endblock %}
+
+
+{% block mainwindow %}
+
+    {% block custom_top %}
+        {{ block.super }}
+    {% endblock %}
+
+    <div id="mainwindow" class="col-md-9" style="height:100%;background:white;margin:0px;padding:0px;">
+
+        <div style="padding:16px;">
+
+            <div style="border:1px solid #ddd">
+
+
+                <div style="background:#f5f5f5;padding:20px;position:relative">
+                    <h4>
+                        {% if edit_api_object %}
+                            编辑接口
+                        {% else %}
+                            添加接口
+                        {% endif %}
+                        <span style="font-size:12px;padding-left:20px;color:#a94442">注:"此色"边框为必填项</span></h4>
+                    <div style="margin-left:20px;">
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            <h5>基本信息</h5>
+                            <div class="form-group has-error">
+                                <div class="input-group">
+                                    <div class="input-group-addon">接口编号</div>
+                                    <input
+                                            {% if edit_api_object %} value={{ edit_api_object.num }} {% else %} {% endif %}
+                                    type="text" class="form-control" name="num" placeholder="接口编号" required="required">
+                                </div>
+                            </div>
+                            <div class="form-group has-error">
+                                <div class="input-group">
+                                    <div class="input-group-addon">接口名称</div>
+                                    <input
+                                            {% if edit_api_object %} value={{ edit_api_object.name }} {% else %} {% endif %}
+                                    type="text" class="form-control" name="name" placeholder="接口名称"
+                                                required="required">
+                                </div>
+                            </div>
+                            <div class="form-group has-error">
+                                <div class="input-group">
+                                    <div class="input-group-addon">请求地址</div>
+                                    <input
+                                            {% if edit_api_object %} value={{ edit_api_object.url }} {% else %} {% endif %}
+                                    type="text" class="form-control" name="url" placeholder="请求地址"
+                                                required="required">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <textarea name="des" class="form-control" placeholder="描述">
+                                    {% if edit_api_object %} {{ edit_api_object.des }} {% else %} {% endif %}
+                                </textarea>
+                            </div>
+                            <div class="form-group" required="required">
+                                <select class="form-control" name="type">
+                                    {% if edit_api_object %}
+                                        {% if edit_api_object.type == "POST" %}
+                                            <option selected="selected" value="POST">POST</option>
+                                            <option value="GET">GET</option>
+                                        {% else %}
+                                            <option value="POST">POST</option>
+                                            <option selected="selected" value="GET">GET</option>
+                                        {% endif %}
+                                    {% else %}
+                                        <option value="GET">GET</option>
+                                        <option value="POST">POST</option>
+                                    {% endif %}
+
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <h5>请求参数</h5>
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th class="col-md-3">参数名</th>
+                                        <th class="col-md-2">参数类型</th>
+                                        <th class="col-md-2">必传</th>
+                                        <th class="col-md-2">缺省值</th>
+                                        <th class="col-md-4">描述</th>
+                                        <th class="col-md-1">
+                                            <button type="button" class="btn btn-success" onclick="add()">新增</button>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="parameter">
+
+                                    {% if edit_api_object %}
+
+                                        {% with ret=edit_api_object.parameter|convert %}
+                                            {% for k,v in ret.items %}
+                                                <tr id="param_{{ k }}">
+                                                    <td class="form-group has-error">
+                                                        <input value="{{ v.0 }}" type="text" class="form-control"
+                                                               name="param_0_{{ k }}"
+                                                               placeholder="参数名"
+                                                               required="required">
+                                                    </td>
+                                                    <td class="form-group has-error"><input value="{{ v.1 }}"
+                                                                                            type="text"
+                                                                                            class="form-control"
+                                                                                            name="param_1_{{ k }}"
+                                                                                            placeholder="参数类型"
+                                                                                            required="required"></td>
+                                                    <td>
+                                                        <select class="form-control" name="param_2_{{ k }}">
+
+                                                            {% if v.2 == "Y" %}
+                                                                <option selected="selected" value="Y">Y</option>
+                                                                <option value="N">N</option>
+                                                            {% else %}
+                                                                <option value="Y">Y</option>
+                                                                <option selected="selected" value="N">N</option>
+                                                            {% endif %}
+
+                                                        </select>
+                                                    </td>
+                                                    <td><input value="{{ v.3 }}" type="text" class="form-control"
+                                                               name="param_3_{{ k }}"
+                                                               placeholder="缺省值">
+                                                    </td>
+                                                    <td><textarea name="param_4_{{ k }}" rows="1" class="form-control" placeholder="描述">{{ v.4 }}</textarea>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger"
+                                                                onclick="del(this)">删除
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endwith %}
+
+                                    {% else %}
+                                        <tr id="param_0">
+                                            <td class="form-group has-error">
+                                                <input value type="text" class="form-control" name="param_0_0"
+                                                       placeholder="参数名"
+                                                       required="required">
+                                            </td>
+                                            <td class="form-group has-error"><input type="text" class="form-control"
+                                                                                    name="param_1_0" placeholder="参数类型"
+                                                                                    required="required"></td>
+                                            <td>
+                                                <select class="form-control" name="param_2_0">
+                                                    <option value="Y">Y</option>
+                                                    <option value="N">N</option>
+                                                </select>
+                                            </td>
+                                            <td><input type="text" class="form-control" name="param_3_0"
+                                                       placeholder="缺省值">
+                                            </td>
+                                            <td><textarea name="param_4_0" rows="1" class="form-control"
+                                                          placeholder="描述"></textarea>
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger" onclick="del(this)">删除
+                                                </button>
+                                            </td>
+                                        </tr>
+
+                                    {% endif %}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="form-group">
+                                <h5>返回结果</h5>
+                                <textarea name="re" rows="3" class="form-control" placeholder="返回结果">{% if edit_api_object %}{{ edit_api_object.re }}{% else %}{% endif %}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <h5>备注</h5>
+                                <textarea name="memo" rows="3" class="form-control" placeholder="备注">{% if edit_api_object %}{{ edit_api_object.memo }}{% else %}{% endif %}</textarea>
+                            </div>
+                            <button class="btn btn-success">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function add() {
+            n = $('#parameter').children("tr:last-child").attr('id');
+            if (n) {
+                n = parseInt(n.split('_')[1]) + parseInt(1)
+            } else {
+                n = 0
+            }
+            var $html = '<tr ' + 'id="param_' + n + '"' + '>' +
+                '<td class="form-group has-error" ><input type="text" class="form-control has-error" name="param_0_' + n + '"' + ' placeholder="参数名" required="required"></td>' +
+                '<td class="form-group has-error">' +
+                '<input type="text" class="form-control" name="param_1_' + n + '"' + ' placeholder="参数类型" required="required"></td>' +
+                '<td>' +
+                '<select class="form-control" name="param_2_' + n + '"> ' +
+                '<option value="Y">Y</option> <option value="N">N</option>' +
+                '</select >' +
+                '</td>' +
+                '<td>' +
+                '<input type="text" class="form-control" name="param_3_' + n + '"' + ' placeholder="缺省值"></td>' +
+                '<td>' +
+                '<textarea name="param_4_' + n + '"' + ' rows="1" class="form-control" placeholder="描述"></textarea>' +
+                '</td>' +
+                '<td>' +
+                '<button type="button" class="btn btn-danger" onclick="del(this)">删除</button>' +
+                '</td>' +
+                '</tr >';
+            $('#parameter').append($html);
+        }
+        function del(obj) {
+            $(obj).parents('tr').remove();
+        }
+    </script>
+    <!--添加接口 end-->
+
+{% endblock %}
