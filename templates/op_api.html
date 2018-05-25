@@ -72,9 +72,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <textarea name="des" class="form-control" placeholder="描述">
-                                    {% if edit_api_object %} {{ edit_api_object.des }} {% else %} {% endif %}
-                                </textarea>
+                                <textarea name="des" class="form-control" placeholder="描述">{% if edit_api_object %}{{ edit_api_object.des }}{% else %}{% endif %}</textarea>
                             </div>
                             <div class="form-group" required="required">
                                 <select class="form-control" name="type">
@@ -144,7 +142,8 @@
                                                                name="param_3_{{ k }}"
                                                                placeholder="缺省值">
                                                     </td>
-                                                    <td><textarea name="param_4_{{ k }}" rows="1" class="form-control" placeholder="描述">{{ v.4 }}</textarea>
+                                                    <td><textarea name="param_4_{{ k }}" rows="1" class="form-control"
+                                                                  placeholder="描述">{{ v.4 }}</textarea>
                                                     </td>
                                                     <td>
                                                         <button type="button" class="btn btn-danger"
