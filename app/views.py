@@ -27,8 +27,7 @@ def new_class(request):
         cname = request.POST['cname']
         cdesc = request.POST['cdesc']
         addtime = int(time.time())
-        new_cate = Cate.objects.create(cname=cname, cdesc=cdesc, addtime=addtime)
-        new_cate.save()
+        Cate.objects.create(cname=cname, cdesc=cdesc, addtime=addtime)
     return HttpResponseRedirect('/')
 
 
@@ -182,8 +181,7 @@ def new_api(request):
     if request.method == "POST":
         kw = get_create_update_arg(request)
         kw['aid'] = aid
-        api_objects = Api.objects.create(**kw)
-        api_objects.save()
+        Api.objects.create(**kw)
         return HttpResponseRedirect('/class_detail/?aid={}'.format(aid))
 
     return render(request, 'op_api.html', locals())

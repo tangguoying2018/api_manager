@@ -51,14 +51,33 @@ yum install supervisor
 files = /etc/supervisor/conf.d/*.conf /path/to/api_manager/config/*.conf
 ```
 
-5. 初始化数据库
+5. 配置数据库
+
+配置文件：settings.py
+
+```
+DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': "api_manager",          #数据库
+        "USER": "api_manager_user",     #数据库帐号
+        "PASSWORD": "api_manager_PASS_123",  #数据库密码
+    }
+}
+```
+
+6. 初始化数据库
 
 ```
 env/bin/python manage.py makemigrations app 
 env/bin/python manage.py migrate
 ```
 
-6. 创建用户
+7. 创建用户
 
 ```
 env/bin/python manage.py createsuperuser
