@@ -73,16 +73,16 @@ WSGI_APPLICATION = 'api_manager.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': "api_manager",
-        "USER": "api_manager_user",
-        "PASSWORD": "api_manager_PASS_123",
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': "api_manager",
+    #     "USER": "api_manager_user",
+    #     "PASSWORD": "api_manager_PASS_123",
+    # }
 }
 
 # Password validation
