@@ -64,10 +64,10 @@ grant all on api_manager.* to api_manager_user@localhost identified by 'api_mana
 
 ```
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #}
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': "api_manager",          #数据库
