@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Cate, Api
 import time
 from django.http import HttpResponseRedirect
+from collections import defaultdict
 
 
 def page_not_found(request):
@@ -107,27 +108,18 @@ def del_api(request):
 
 
 def get_create_update_arg(request):
-    parameter = {}
+    parameter = defaultdict(dict)
     for i in request.POST:
         if i.startswith("param_"):
             """
-                param_1_0 : username
-                param_1_1 : int
+                param_1_0 : 1 表示第一行参数，0 表示第一行第一个参数
+                param_2_0 : 2 表示第二行参数，0 表示第二行第一个参数
             """
             # print i, request.POST[i].encode('utf-8')
             f1 = i.split('_')[1]
             f2 = i.split('_')[2]
-            try:
-                tmp = parameter[int(f2)]
-            except Exception as e:
-                tmp = {}
-            tmp[int(f1)] = request.POST[i].strip()
-            parameter[int(f2)] = tmp
-        else:
-            continue
-            # print tmp
-            # print parameter
-
+            parameter[int(f2)][int(f1)] = request.POST[i].strip()
+    parameter = dict(parameter)
     print "parameter: {}".format(parameter)
 
     kw = {
